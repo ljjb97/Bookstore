@@ -7,6 +7,7 @@
 
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
+use diesel::dsl::sql;
 use self::models::{NewCart, Cart, NewUsr, Usr, NewBook, Book};
 
 use std::collections::HashMap;
@@ -109,6 +110,12 @@ struct TemplateBookContext {
     Pub_name: String
 }
 
+//Struct for search results template
+#[derive(Serialize)]
+struct TemplateSearchContext {
+    books: Vec<Book>
+}
+
 //Struct for empty template contexts
 #[derive(Serialize)]
 struct TemplateWriteContext {
@@ -158,13 +165,29 @@ fn getsearch() -> Template {
 
 //Route for showing search results
 #[post("/search/finder", format = "form", data = "<temp>")]
-fn postsearch(temp: Form<search>) -> Redirect {
+fn postsearch(temp: Form<search>) -> Template {
     let connection = establish_connection();
     println!("{}", temp.isbn);
-    if(temp.isbn == ""){
-        println!("null");
+    //If the isbn is given then we know that there can only be one book
+    if temp.isbn != "" {
+        let sisbn = temp.isbn.to_string();
+        return getbook(sisbn)
     }
-    Redirect::to(uri!(getsearch))
+    use schema::book::dsl::*;
+
+    let sqlstatement = &format!("
+    SELECT *
+    FROM book
+    WHERE title = {} OR genre = {}
+    ", temp.title, temp.genre);
+    let books = book.filter(sql(sqlstatement))
+        .load::<Book>(&connection)
+        .expect("Error loading books");
+    
+    Template::render("results", &TemplateSearchContext {
+        books: books
+    })
+    //Template::render("results", context)
 }
 
 //Route for the add book form
@@ -179,8 +202,6 @@ fn addbook() -> Template {
 fn postadd(temp: Form<add>) -> Redirect {
     let connection = establish_connection();
     
-    println!("its lit");
-
     let book = create_book(&connection, &temp.isbn,
     &temp.author_fname, &temp.author_lname, 
     &temp.title, &temp.genre, &temp.page_count,

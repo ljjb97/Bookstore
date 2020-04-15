@@ -52,7 +52,7 @@ pub struct Usr {
     pub lname: String,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize)]
 pub struct Book {
     pub isbn: String,
     pub author_fname: String,
