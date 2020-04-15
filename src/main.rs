@@ -16,7 +16,9 @@ use rocket::request::Form;
 use rocket::response::Redirect;
 use rocket_contrib::templates::Template;
 
-//functions to create table entries
+//Functions to create table entries
+
+//Function to create an entry in the table cart
 pub fn create_cart<'a>(conn: &PgConnection, isbn: &'a str, email: &'a str, quantity: &'a i32) -> Cart {
     use schema::cart;
 
@@ -26,12 +28,14 @@ pub fn create_cart<'a>(conn: &PgConnection, isbn: &'a str, email: &'a str, quant
         quantity: quantity,
     };
 
+    //Inserts the new_cart into the cart table
     diesel::insert_into(cart::table)
         .values(&new_cart)
         .get_result(conn)
         .expect("Error saving new cart")
 }
 
+//Function to create an entry in the table usr
 pub fn create_usr<'a>(conn: &PgConnection, email: &'a str, passwrd: &'a str, addrss: &'a str, fname: &'a str, lname: &'a str) -> Usr {
     use schema::usr;
 
@@ -43,12 +47,14 @@ pub fn create_usr<'a>(conn: &PgConnection, email: &'a str, passwrd: &'a str, add
         lname: lname
     };
 
+    //Inserts the new_usr into the usr table
     diesel::insert_into(usr::table)
         .values(&new_usr)
         .get_result(conn)
         .expect("Error saving new usr")
 }
 
+//Function to create an entry in the table book
 pub fn create_book<'a>(conn: &PgConnection, isbn: &'a str,
  author_fname: &'a str, author_lname: &'a str, 
  title: &'a str, genre: &'a str, page_count: &'a i32,
@@ -69,13 +75,14 @@ pub fn create_book<'a>(conn: &PgConnection, isbn: &'a str,
         pub_name: pub_name
     };
 
+    //Insets the new_book into the book table
     diesel::insert_into(book::table)
         .values(&new_book)
         .get_result(conn)
         .expect("Error saving new book")
 }
 
-//connecting to the database
+//Connecting to the database
 pub fn establish_connection() -> PgConnection {
     
     let database_url = dotenv::var("DATABASE_URL")
@@ -87,14 +94,9 @@ pub fn establish_connection() -> PgConnection {
 pub mod schema;
 pub mod models;
 
-//structs for templates
-#[derive(Serialize)]
-struct TemplateSearchContext {
-    value: i32,
-    Title: String,
-    Body: String
-}
+//Structs for templates
 
+//Struct for book template
 #[derive(Serialize)]
 struct TemplateBookContext {
     Title: String,
@@ -107,11 +109,14 @@ struct TemplateBookContext {
     Pub_name: String
 }
 
+//Struct for empty template contexts
 #[derive(Serialize)]
 struct TemplateWriteContext {
 }
 
-//structs for parsing form data
+//Structs for parsing form data
+
+//Struct for search form
 #[derive(FromForm)]
 struct search {
     isbn: String,
@@ -121,6 +126,7 @@ struct search {
     lname: String, 
 }
 
+//Struct for add book form
 #[derive(FromForm)]
 struct add {
     isbn: String,
@@ -135,18 +141,22 @@ struct add {
     pub_name: String,
 }
 
-//routing
+//Routing
+
+//Default route. Redirects to search.
 #[get("/")]
 fn index() -> Redirect {
     Redirect::to(uri!(getsearch))
 }
 
+//Route for searching
 #[get("/search")]
 fn getsearch() -> Template {
     let context = TemplateWriteContext {};
     Template::render("search", &context)
 }
 
+//Route for showing search results
 #[post("/search/finder", format = "form", data = "<temp>")]
 fn postsearch(temp: Form<search>) -> Redirect {
     let connection = establish_connection();
@@ -157,12 +167,14 @@ fn postsearch(temp: Form<search>) -> Redirect {
     Redirect::to(uri!(getsearch))
 }
 
+//Route for the add book form
 #[get("/admin/addbook")]
 fn addbook() -> Template {
     let context = TemplateWriteContext {};
     Template::render("addbook", &context)
 }
 
+//Route for data from the add book form
 #[post("/admin/addbook/add", format = "form", data = "<temp>")]
 fn postadd(temp: Form<add>) -> Redirect {
     let connection = establish_connection();
@@ -178,6 +190,7 @@ fn postadd(temp: Form<add>) -> Redirect {
     Redirect::to(uri!(getbook: isbn = &temp.isbn))
 }
 
+//Route for displaying book with isbn equal to the isbn in the route
 #[get("/book/<isbn>")]
 fn getbook(isbn: String) -> Template {
     use schema::book::dsl::*;
@@ -207,6 +220,7 @@ fn getbook(isbn: String) -> Template {
     Template::render("book", &context)
 }
 
+//Page not found route
 #[catch(404)]
 fn not_found(req: &Request<'_>) -> Template {
     let mut map = HashMap::new();
@@ -215,7 +229,7 @@ fn not_found(req: &Request<'_>) -> Template {
 }
 
 
-//
+//Function for building rockets
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
         .mount("/", routes![index, getsearch, postsearch,
