@@ -1,0 +1,37 @@
+{% extends "base" %}
+
+{% block content %}
+    <h1>Add book</h1>
+    <form action="/admin/addbook/add" method="post">
+        <label for="isbn">ISBN:<br>
+        <input type="text" id="isbn" name="isbn"><br>
+
+        <label for="author_fname">First Name:<br>
+        <input type="text" id="author_fname" name="author_fname"><br>
+
+        <label for="author_lname">Last Name:<br>
+        <input type="text" id="author_lname" name="author_lname"><br>
+
+        <label for="title">Title:<br>
+        <input type="text" id="title" name="title"><br>
+
+        <label for="genre">Genre:</label><br>
+        <input type="text" id="genre" name="genre"><br>
+
+        <label for="page_count">Page count:<br>
+        <input type="number" id="page_count" name="page_count"><br>
+
+        <label for="price">Price:<br>
+        <input type="number" id="price" name="price"><br>
+
+        <label for="stock">Stock:<br>
+        <input type="number" id="stock" name="stock"><br>
+
+        <label for="prcnt_of_sale">Percent of sale:<br>
+        <input type="number" id="prcnt_of_sale" name="prcnt_of_sale"><br>
+
+        <label for="pub_name">Publisher name:<br>
+        <input type="text" id="pub_name" name="pub_name"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock content %}

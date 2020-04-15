@@ -1,0 +1,12 @@
+{% extends "base" %}
+
+{% block content %}
+    <h1>Blog</h1>
+    <form action="/write/publish" method="post">
+        <label for="title">Title:<br>
+        <input type="text" id="title" name="title"><br>
+        <label for="body">Body:</label><br>
+        <input type="text" id="body" name="body"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% extends "base" %}
+
+{% block content %}
+    <h1>Search</h1>
+    <form action="/search/finder" method="post">
+        <label for="isbn">ISBN:<br>
+        <input type="text" id="isbn" name="isbn"><br>
+        <label for="title">Title:<br>
+        <input type="text" id="title" name="title"><br>
+        <label for="genre">Genre:</label><br>
+        <input type="text" id="genre" name="genre"><br>
+        <label for="fname">First Name:<br>
+        <input type="text" id="fname" name="fname"><br>
+        <label for="lname">Last Name:<br>
+        <input type="text" id="lname" name="lname"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock content %}

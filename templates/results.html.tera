@@ -1,0 +1,21 @@
+{% extends "base" %}
+
+{% block content %}
+    <h1>Blog post {{value}}</h1>
+    <table>
+        <tr>
+            <td>ISBN</td>
+            <td>Title</td>
+            <td>First name</td>
+            <td>Last name</td>
+        </tr>
+        {% for book in books %}
+            <tr>
+                <td>{{book.isbn}}</td>
+                <td>{{book.title}}</td>
+                <td>{{book.author_lname}}</td>
+                <td>{{book.author_fname}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}
